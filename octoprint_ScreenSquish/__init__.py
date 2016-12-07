@@ -47,6 +47,25 @@ class ScreenSquishPlugin(octoprint.plugin.AssetPlugin, octoprint.plugin.Template
 		if isinstance(version, tuple):
 			return version[:2]
 		return version
+	
+	 ##~~ Softwareupdate hook
+         def get_update_information(self):
+             return dict(
+                 screensquish=dict(
+                     displayName="Printer Stats",
+                     displayVersion=self._plugin_version,
+
+                     # version check: github repository
+                     type="github_release",
+                     user="Robo3D",
+                     repo="OctoPrint-ScreenSquish",
+                     current=self._plugin_version,
+
+                     # update method: pip w/ dependency links
+                     pip="https://github.com/Robo3D/OctoPrint-ScreenSquish/archive/{target_version}.zip"
+            )
+        )
+
 
 __plugin_name__ = "ScreenSquish"
 
@@ -54,5 +73,7 @@ def __plugin_load__():
 	global __plugin_implementation__
 	__plugin_implementation__ = ScreenSquishPlugin()
 
-	# global __plugin_hooks__
-	# __plugin_hooks__ = {"some.octoprint.hook": __plugin_implementation__.some_hook_handler}
+	global __plugin_hooks__
+        __plugin_hooks__ = {
+            "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
+        }
